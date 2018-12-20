@@ -4,6 +4,9 @@
 #include <cerrno>
 #include <unistd.h>
 #include <sys/inotify.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/regex.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "zmq.hpp"
 
@@ -47,16 +50,24 @@ std::ostream &operator<<(std::ostream &os, inotify_event const &ievent) {
 
 void process_event(struct inotify_event* event, zmq::socket_t& socket)
 {
+  static const boost::regex name_regex(".*h5");
+  boost::posix_time::ptime timestamp(boost::posix_time::microsec_clock::local_time());
   std::string name("");
   if (event->len > 0)
   {
-    std::stringstream ss; ss << *event;
-    std::string event_json(ss.str());
+    name = event->name;
+    if (boost::regex_match(name, name_regex))
+    {
+      std::stringstream ss;
+      ss << "{\"name\": \"" << name << "\", \"timestamp\": \""
+         << boost::posix_time::to_iso_extended_string(timestamp) << "\"}";
+      std::string json_msg(ss.str());
+      std::cout << json_msg << std::endl;
 
-    zmq::message_t message(event_json.size());
-    memcpy(message.data(), event_json.c_str(), event_json.size());
-    //std::cout << message << std::endl;
-    socket.send(message, ZMQ_NOBLOCK);
+      zmq::message_t message(json_msg.size());
+      memcpy(message.data(), json_msg.c_str(), json_msg.size());
+      socket.send(message, ZMQ_NOBLOCK);
+    }
   }
 }
 
@@ -76,7 +87,6 @@ int main() {
     std::cerr << "ERROR: inotify_init() failed. code: " << inotify_fd << std::endl;
     return -1;
   }
-
 
   //  Socket to send messages on
   zmq::socket_t sender(context, ZMQ_PUSH);
@@ -119,7 +129,6 @@ int main() {
   }
 
   std::cout << "Closing down inotify watch" << std::endl;
-
   status = inotify_rm_watch(inotify_fd, wd);
   if (status == -1)
   {
