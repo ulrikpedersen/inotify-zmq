@@ -1,6 +1,7 @@
 # IDE
 .idea/
 cmake-build-debug/
+centos-build/
 
 # Prerequisites
 *.d

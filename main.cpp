@@ -3,7 +3,11 @@
 #include <cstring>
 #include <cerrno>
 #include <unistd.h>
-#include <sys/inotify.h>
+#ifdef __linux__
+  #include <sys/inotify.h>
+#else
+  #include "inotifymock.h"
+#endif
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
@@ -107,6 +111,8 @@ int main() {
     if (read_count == 0)
     {
       std::cerr << "ERROR: read() from inotify fd returned 0!" << std::endl;
+      carry_on = false;
+      continue;
     }
 
     if (read_count == -1)
