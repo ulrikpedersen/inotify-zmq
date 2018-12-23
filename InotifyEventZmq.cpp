@@ -60,6 +60,7 @@ watch_dir_name(".")
   {
     std::cerr << "ERROR: inotify_init() failed. code: " << this->inotify_fd << std::endl;
   }
+  zmq_socket.bind("tcp://*:9988");
 }
 
 InotifyEventZmq::~InotifyEventZmq()
