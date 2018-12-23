@@ -34,15 +34,11 @@ int inotify_init (void)
 
 int inotify_add_watch (int __fd, const char *__name, unsigned int __mask)
 {
-  int fd = open("mockinotifyfile-deleteme", O_RDONLY);
-  if (fd != __fd) std::cerr << "ERROR: inotify_add_watch() didn't open the same file descriptor" << std::endl;
-
   return 0;
 }
 
 int inotify_rm_watch (int __fd, int __wd)
 {
-  close(__fd);
   return 0;
 }
 
