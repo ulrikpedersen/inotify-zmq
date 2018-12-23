@@ -13,6 +13,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "zmq.hpp"
+#include "InotifyEventZmq.h"
 
 #define BUF_SIZE (1024*1024)
 void process_event(struct inotify_event* event, zmq::socket_t& socket);
