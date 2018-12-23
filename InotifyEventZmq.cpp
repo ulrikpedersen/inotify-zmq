@@ -97,8 +97,12 @@ void InotifyEventZmq::process_event(const struct inotify_event &event, const boo
     name = event.name;
     if (boost::regex_match(name, this->filename_pattern_regex))
     {
+      boost::filesystem::path base_path(this->watch_dir_name);
+      boost::filesystem::path full_filename(boost::filesystem::absolute(boost::filesystem::path(name), base_path));
       std::stringstream ss;
-      ss << "{\"name\": \"" << name << "\", \"timestamp\": \""
+      ss << "{\"name\": \"" << name
+         << "\", \"fullname\": " << full_filename
+         << ", \"timestamp\": \""
          << boost::posix_time::to_iso_extended_string(timestamp) << "\"}";
       std::string json_msg(ss.str());
       std::cout << json_msg << std::endl;
