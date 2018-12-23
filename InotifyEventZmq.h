@@ -9,6 +9,7 @@
 #include <boost/regex.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+
 #include "zmq.hpp"
 
 class InotifyEventZmq {
@@ -18,6 +19,7 @@ public:
   void watch_dir(const std::string& pathname);
   void process_event(const struct inotify_event &event, const boost::posix_time::ptime& timestamp);
   void set_filename_pattern_regex(const std::string &filename_pattern_regex);
+  int get_file_descriptor() { return inotify_fd; }
 
   virtual ~InotifyEventZmq();
 

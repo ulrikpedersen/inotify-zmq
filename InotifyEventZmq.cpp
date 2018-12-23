@@ -2,6 +2,7 @@
 // Created by Ulrik K Pedersen on 2018-12-22.
 //
 #include <iostream>
+#include <stdexcept>
 #include <unistd.h>
 
 #ifdef __linux__
@@ -12,6 +13,7 @@
 #include "InotifyEventZmq.h"
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem/operations.hpp>
 
 
 InotifyEventZmq::InotifyEventZmq(zmq::context_t& context) :
@@ -20,7 +22,7 @@ zmq_socket(context, ZMQ_PUSH),
 inotify_wd(0),
 watch_dir_name(".")
 {
-  if (this->inotify_wd <= 0)
+  if (this->inotify_fd <= 0)
   {
     std::cerr << "ERROR: inotify_init() failed. code: " << this->inotify_fd << std::endl;
   }
@@ -41,13 +43,14 @@ InotifyEventZmq::~InotifyEventZmq()
 
 void InotifyEventZmq::handle_inotify_event()
 {
+  boost::posix_time::ptime timestamp(boost::posix_time::microsec_clock::local_time());
+
   size_t read_count;
   read_count = read(inotify_fd, events_buf, InotifyEventZmq::buffer_size);
-  boost::posix_time::ptime timestamp(boost::posix_time::microsec_clock::local_time());
   if (read_count == 0)
   {
     std::cerr << "ERROR: read() from inotify fd returned 0!" << std::endl;
-    return;
+    throw std::string("ERROR: read() from inotify fd returned 0");
   }
 
   if (read_count == -1)
@@ -71,13 +74,15 @@ void InotifyEventZmq::handle_inotify_event()
 
 void InotifyEventZmq::watch_dir(const std::string &pathname)
 {
+  boost::filesystem::path p(pathname);
+  this->watch_dir_name = boost::filesystem::canonical(p).string();
   if (inotify_wd > 0 && inotify_fd > 0)
   {
     inotify_rm_watch(this->inotify_fd, this->inotify_wd);
     this->inotify_wd = -1;
   }
   this->inotify_wd = inotify_add_watch(this->inotify_fd, pathname.c_str(), IN_MOVED_TO);
-  if (this->inotify_wd <= 0)
+  if (this->inotify_wd == -1)
   {
     std::cerr << "ERROR: Unable to start inotify watch on path: \"" << pathname
               << "\" errno: " << errno << " " << strerror(errno) << std::endl;
