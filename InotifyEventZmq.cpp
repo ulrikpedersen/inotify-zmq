@@ -15,6 +15,40 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 
+std::ostream &operator<<(std::ostream &os, inotify_event const &ievent) {
+  os << "{"; // Start JSON
+
+  // Cookie
+  os << " \"cookie\": " << ievent.cookie;
+
+  // Mask
+  os << ", \"mask\": [" << ievent.mask;
+  if (ievent.mask & IN_ACCESS)        os << ", \"IN_ACCESS\"";
+  if (ievent.mask & IN_ATTRIB)        os << ", \"IN_ATTRIB\"";
+  if (ievent.mask & IN_CLOSE_NOWRITE) os << ", \"IN_CLOSE_NOWRITE\"";
+  if (ievent.mask & IN_CLOSE_WRITE)   os << ", \"IN_CLOSE_WRITE\"";
+  if (ievent.mask & IN_CREATE)        os << ", \"IN_CREATE\"";
+  if (ievent.mask & IN_DELETE)        os << ", \"IN_DELETE\"";
+  if (ievent.mask & IN_DELETE_SELF)   os << ", \"IN_DELETE_SELF\"";
+  if (ievent.mask & IN_IGNORED)       os << ", \"IN_IGNORED\"";
+  if (ievent.mask & IN_ISDIR)         os << ", \"IN_ISDIR\"";
+  if (ievent.mask & IN_MODIFY)        os << ", \"IN_MODIFY\"";
+  if (ievent.mask & IN_MOVE_SELF)     os << ", \"IN_MOVE_SELF\"";
+  if (ievent.mask & IN_MOVED_FROM)    os << ", \"IN_MOVED_FROM\"";
+  if (ievent.mask & IN_MOVED_TO)      os << ", \"IN_MOVED_TO\"";
+  if (ievent.mask & IN_OPEN)          os << ", \"IN_OPEN\"";
+  if (ievent.mask & IN_Q_OVERFLOW)    os << ", \"IN_Q_OVERFLOW\"";
+  if (ievent.mask & IN_UNMOUNT)       os << ", \"IN_UNMOUNT\"";
+  os << "]";
+
+  // dir/file name
+  if (ievent.len > 0) {
+    os << ", \"name\": \"" << ievent.name << "\"";
+  }
+
+  os << " }"; // End JSON
+  return os;
+}
 
 InotifyEventZmq::InotifyEventZmq(zmq::context_t& context) :
 inotify_fd(inotify_init()),

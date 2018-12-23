@@ -66,6 +66,5 @@ int inotify_add_watch (int __fd, const char *__name, unsigned int __mask);
 /* Remove the watch specified by WD from the inotify instance FD.  */
 int inotify_rm_watch (int __fd, int __wd);
 
-std::ostream &operator<<(std::ostream &os, inotify_event const &ievent);
 
 #endif //FILETOZMQ_INOTIFYMOCK_H
