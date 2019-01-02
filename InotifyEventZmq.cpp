@@ -102,7 +102,7 @@ void InotifyEventZmq::handle_inotify_event()
     struct inotify_event *event;
     event = (struct inotify_event *) ptr;
     std::cout << *event << std::endl;
-    process_event(*event, timestamp);
+    process_event(*event, timestamp, ".*h5");
     ptr += sizeof(struct inotify_event) + event->len;
   }
 }
@@ -124,13 +124,14 @@ void InotifyEventZmq::watch_dir(const std::string &pathname)
   }
 }
 
-void InotifyEventZmq::process_event(const struct inotify_event &event, const boost::posix_time::ptime& timestamp)
+void InotifyEventZmq::process_event(const struct inotify_event &event, const boost::posix_time::ptime &timestamp,
+                                    const std::string &filename_regex)
 {
   std::string name("");
   if (event.len > 0)
   {
     name = event.name;
-    if (boost::regex_match(name, this->filename_pattern_regex))
+    if (boost::regex_match(name, boost::regex(filename_regex)))
     {
       boost::filesystem::path base_path(this->watch_dir_name);
       boost::filesystem::path full_filename(boost::filesystem::absolute(boost::filesystem::path(name), base_path));
@@ -149,6 +150,3 @@ void InotifyEventZmq::process_event(const struct inotify_event &event, const boo
   }
 }
 
-void InotifyEventZmq::set_filename_pattern_regex(const std::string &filename_pattern_regex) {
-  this->filename_pattern_regex = boost::regex(filename_pattern_regex);
-}

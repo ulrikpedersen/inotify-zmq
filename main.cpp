@@ -27,7 +27,6 @@ int main()
   InotifyEventZmq iez(context);
 
   const char * pathname = ".";
-  iez.set_filename_pattern_regex(".*h5");
   iez.watch_dir(pathname);
 
   bool carry_on = true;
@@ -37,7 +36,7 @@ int main()
     fd.events = POLLIN;
     fd.fd = iez.get_file_descriptor();
 
-    status = poll(&fd, 1, 1000);
+    status = poll(&fd, 1, 5000);
     if (status == 0)
     {
       std::cerr << "poll() timed out" << std::endl;

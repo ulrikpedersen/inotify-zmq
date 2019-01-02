@@ -19,8 +19,8 @@ public:
   InotifyEventZmq(zmq::context_t& context);
   void handle_inotify_event();
   void watch_dir(const std::string& pathname);
-  void process_event(const struct inotify_event &event, const boost::posix_time::ptime& timestamp);
-  void set_filename_pattern_regex(const std::string &filename_pattern_regex);
+  void process_event(const struct inotify_event &event, const boost::posix_time::ptime &timestamp,
+                       const std::string &filename_regex);
   int get_file_descriptor() { return inotify_fd; }
 
   virtual ~InotifyEventZmq();
@@ -28,7 +28,6 @@ public:
 private:
   int inotify_fd; // file descriptor
   int inotify_wd; // watch descriptor
-  boost::regex filename_pattern_regex;
   std::string watch_dir_name;
   zmq::socket_t zmq_socket;
 
