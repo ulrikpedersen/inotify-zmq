@@ -12,6 +12,8 @@
 
 #include "zmq.hpp"
 
+class inotify_event;
+
 std::ostream &operator<<(std::ostream &os, inotify_event const &ievent);
 
 class InotifyEventZmq {

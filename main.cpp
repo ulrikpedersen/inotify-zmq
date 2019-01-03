@@ -15,9 +15,10 @@
 
 #include "zmq.hpp"
 #include "InotifyEventZmq.h"
+#include "FilePushZmq.h"
 
 
-int main()
+int inotify_eventloop()
 {
   int return_code = 0;
   int status = 0;
@@ -57,3 +58,18 @@ int main()
   return return_code;
 }
 
+void file_read_eventloop()
+{
+  boost::posix_time::ptime timestamp(boost::posix_time::microsec_clock::local_time());
+  CBFImage cbf("blah.cbf", timestamp);
+  cbf.load_data();
+  CBFImage::ImageInfo_t image_info;
+  cbf.get_info(image_info);
+
+}
+
+int main(int argc, char** argv)
+{
+  file_read_eventloop();
+  return 0;
+}

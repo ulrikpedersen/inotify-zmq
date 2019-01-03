@@ -12,5 +12,5 @@ find_package( Boost 1.41.0
 
 include_directories(${ZEROMQ_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-add_executable(filetozmq main.cpp zmq.hpp inotifymock.h inotifymock.cpp InotifyEventZmq.cpp InotifyEventZmq.h)
+add_executable(filetozmq main.cpp zmq.hpp inotifymock.h inotifymock.cpp InotifyEventZmq.cpp InotifyEventZmq.h FilePushZmq.cpp FilePushZmq.h)
 target_link_libraries(filetozmq ${ZEROMQ_LIBRARIES} ${Boost_LIBRARIES})
